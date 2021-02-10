@@ -17,7 +17,7 @@ Streaming event pipeline with Apache Kafka and its ecosystem, using public data 
 	docker-compose up
 	```
 
-![Project Architecture](images/diagram.png)
+![Project Architecture](docs/images/diagram.png)
 
 ### Resources
 
