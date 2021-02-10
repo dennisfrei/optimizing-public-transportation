@@ -29,7 +29,7 @@ def configure_connector():
 
     resp = requests.get(f"{KAFKA_CONNECT_URL}/{CONNECTOR_NAME}")
     if resp.status_code == 200:
-        logging.debug("connector already created skipping recreation")
+        logging.info("connector already created skipping recreation")
         return
 
     resp = requests.post(
@@ -51,7 +51,7 @@ def configure_connector():
                     "table.whitelist": "stations",
                     "mode": "incrementing",
                     "incrementing.column.name": "stop_id",
-                    "topic.prefix": "org.chicago.",
+                    "topic.prefix": "org.chicago.transit.",
                     "poll.interval.ms": "10000"
                 }
             }
@@ -60,7 +60,7 @@ def configure_connector():
     ## Ensure a healthy response was given
     try:
         resp.raise_for_status()
-        logging.debug("connector created successfully")
+        logging.info("connector created successfully")
     except Exception as err:
         logging.error(f"Failed with code: {resp.status_code} and reason: {json.dumps(resp.json())}")
         raise err

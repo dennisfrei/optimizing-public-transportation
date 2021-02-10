@@ -24,3 +24,25 @@ k
 ```bash
 kafka-console-consumer --bootstrap-server localhost:9092 --topic myTopic
 ```
+
+## KSQL
+
+### Show Tables
+```sql
+SHOW TABLES;
+```
+
+### Show Queries
+```sql
+SHOW QUERIES;
+```
+
+### Terminate Query
+```sql
+TERMINATE QUERY <query>;
+```
+
+### DROP TABLE
+```sql
+DROP TABLE <name>;
+```
