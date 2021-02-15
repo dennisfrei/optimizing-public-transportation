@@ -58,13 +58,13 @@ class Line:
         """Given a kafka message, extract data"""
         topic_name = message.topic()
               
-        if topic_name == "org.chicago.transit.stations.table.v1":
+        if topic_name == "org.chicago.cta.stations.table.v1":
             try:
                 value = json.loads(message.value())
                 self._handle_station(value)
             except Exception as e:
-                logger.fatal("bad station? %s, %s", value, e)
-        elif topic_name == "org.chicago.transit.arrivals":
+                logger.fatal(f"Bad station? {value}, {e}")
+        elif topic_name == "org.chicago.cta.station.arrivals.v1":
             self._handle_arrival(message)
         elif topic_name == "TURNSTILE_SUMMARY":
             json_data = json.loads(message.value())

@@ -21,7 +21,7 @@ class KafkaConsumer:
         message_handler,
         is_avro=True,
         offset_earliest=False,
-        sleep_secs=1.0,
+        sleep_secs=.5,
         consume_timeout=0.1,
         broker_properties={}
     ):
@@ -37,12 +37,11 @@ class KafkaConsumer:
             "bootstrap.servers": self._BROKER_URL,
             "group.id": "0"
         }
-        self.broker_properties.update(broker_properties)
 
-        if offset_earliest is True:
-            self.broker_properties.update(
-                {"auto.offset.reset": "earliest"}
-            )
+        #if offset_earliest is True:
+        #    self.broker_properties.update(
+        #        {"auto.offset.reset": "earliest"}
+        #    )
 
         if is_avro is True:
             self.broker_properties.update(
@@ -51,6 +50,7 @@ class KafkaConsumer:
             self.consumer = AvroConsumer(self.broker_properties)
         else:
             self.consumer = Consumer(self.broker_properties)
+        self.broker_properties.update(broker_properties)
 
         
         self.consumer.subscribe(
@@ -80,9 +80,9 @@ class KafkaConsumer:
     def _consume(self):
         """Polls for a message. Returns 1 if a message was received, 0 otherwise"""
         try:
-            message = self.consumer.poll(1.0)
-
-            assert_message_1 = "Message should not be None"
+            message = self.consumer.poll(self.consume_timeout)
+            
+            assert_message_1 = f"Message should not be None for {self.topic_name_pattern}"
             assert message is not None, assert_message_1
 
             assert_message_2 = "Error message: {}".format(
@@ -91,10 +91,11 @@ class KafkaConsumer:
             assert message.error() is None, assert_message_2
 
             result = message.value()
+            self.message_handler(message)
             return 1
 
         except AssertionError as err:
-            logger.error(err)
+            logger.debug(err)
             return 0
 
         except KeyError as err:
