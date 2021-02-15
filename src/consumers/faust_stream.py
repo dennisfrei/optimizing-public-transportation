@@ -35,17 +35,17 @@ app = faust.App(
     store="memory://"
 )
 topic = app.topic(
-    "org.chicago.transit.stations",
+    "org.chicago.cta.stations",
     value_type=Station
 )
 out_topic = app.topic(
-    "org.chicago.transit.stations.table.v1",
+    "org.chicago.cta.stations.table.v1",
     partitions=1
 )
 table = app.Table(
-    "org.chicago.transit.stations.table.v1",
+    "org.chicago.cta.stations.table.v1",
     default="int",
-    partitions=1, # TODO: Adjust
+    partitions=1,
     changelog_topic=out_topic,
 )
 
@@ -66,7 +66,7 @@ def get_line(event):
             logger.debug(f"{color}, {value}")
             lines.add(color)
     if len(lines) == 0:
-        logger.error("No color is set to True. One value is neccessary")
+        logger.debug("No color is set to True.")
         return None
     elif len(lines) > 1:
         logger.error(
