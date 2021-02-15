@@ -2,10 +2,11 @@
 import logging
 import time
 
-
 from confluent_kafka import avro
 from confluent_kafka.admin import AdminClient, NewTopic
 from confluent_kafka.avro import AvroProducer, CachedSchemaRegistryClient
+
+from models.topic_check import existing_topic_set
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +15,7 @@ class Producer:
     """Defines and provides common functionality amongst Producers"""
 
     # Tracks existing topics across all Producer instances
-    existing_topics = set([])
+    existing_topics = existing_topic_set()
 
     def __init__(
         self,
@@ -94,7 +95,7 @@ class Producer:
 
     def close(self):
         """Prepares the producer for exit by cleaning up the producer"""
-        logger.info("Shutting down")
+        logger.debug(f"Shutting down")
         if self.producer is not None:
             self.producer.flush()
 
