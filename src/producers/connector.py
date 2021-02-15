@@ -12,7 +12,7 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 
-KAFKA_CONNECT_URL = "http://localhost:8083/connectors"
+KAFKA_CONNECT_URL = "http://127.0.0.1:8083/connectors"
 CONNECTOR_NAME = "stations"
 CONNECTION_URL = os.getenv("CONNECTION_URL", "jdbc:postgresql://postgres:5432/cta")
 CONNECTION_USER = os.getenv("CONNECTION_USER", "user")
@@ -51,7 +51,7 @@ def configure_connector():
                     "table.whitelist": "stations",
                     "mode": "incrementing",
                     "incrementing.column.name": "stop_id",
-                    "topic.prefix": "org.chicago.transit.",
+                    "topic.prefix": "org.chicago.cta.",
                     "poll.interval.ms": "10000"
                 }
             }

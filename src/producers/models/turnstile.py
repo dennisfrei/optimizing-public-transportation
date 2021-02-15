@@ -21,11 +21,11 @@ class Turnstile(Producer):
         """Create the Turnstile"""
 
         super().__init__(
-            f"org.chicago.transit.turnstiles", # .{station.station_name}",
+            f"org.chicago.cta.turnstiles.v1",
             key_schema=Turnstile.key_schema,
             value_schema=Turnstile.value_schema,
-            num_partitions=1, # TODO: Update
-            num_replicas=1 # TODO: Update
+            num_partitions=4,
+            num_replicas=1
         )
 
         self.station = station

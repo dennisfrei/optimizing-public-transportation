@@ -17,7 +17,11 @@ from connector import configure_connector
 from models import Line, Weather
 
 
+TO_CELSIUS=True
+
+
 logger = logging.getLogger(__name__)
+
 
 
 class TimeSimulation:
@@ -64,7 +68,7 @@ class TimeSimulation:
         configure_connector()
 
         logger.info("beginning cta train simulation")
-        weather = Weather(curr_time.month)
+        weather = Weather(curr_time.month, to_celsius=TO_CELSIUS)
         try:
             while True:
                 logger.debug("simulation running: %s", curr_time.isoformat())
