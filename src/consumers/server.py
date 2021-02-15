@@ -7,15 +7,12 @@ import tornado.ioloop
 import tornado.template
 import tornado.web
 
+from consumer import KafkaConsumer
+from models import Lines, Weather
+from topic_check import topic_exists
 
 # Import logging before models to ensure configuration is picked up
 logging.config.fileConfig(f"{Path(__file__).parents[0]}/logging.ini")
-
-
-from consumer import KafkaConsumer
-from models import Lines, Weather
-import topic_check
-
 
 logger = logging.getLogger(__name__)
 
@@ -41,12 +38,12 @@ class MainHandler(tornado.web.RequestHandler):
 
 def run_server():
     """Runs the Tornado Server and begins Kafka consumption"""
-    if topic_check.topic_exists("TURNSTILE_SUMMARY") is False:
+    if topic_exists("TURNSTILE_SUMMARY") is False:
         logger.fatal(
             "Ensure that the KSQL Command has run successfully before running the web server!"
         )
         exit(1)
-    if topic_check.topic_exists("org.chicago.cta.stations.table.v1") is False:
+    if topic_exists("org.chicago.cta.stations.table.v1") is False:
         logger.fatal(
             "Ensure that Faust Streaming is running successfully before running the web server!"
         )
@@ -74,7 +71,7 @@ def run_server():
             is_avro=False,
         ),
         KafkaConsumer(
-            "org.chicago.cta.station.arrivals.v1",
+            "^org.chicago.cta.station.arrivals.*",
             lines.process_message,
             offset_earliest=True,
         ),

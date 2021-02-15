@@ -13,15 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 KAFKA_CONNECT_URL = "http://127.0.0.1:8083/connectors"
-CONNECTOR_NAME = "stations"
+CONNECTOR_NAME = "stations.v1"
 CONNECTION_URL = os.getenv("CONNECTION_URL", "jdbc:postgresql://postgres:5432/cta")
-CONNECTION_USER = os.getenv("CONNECTION_USER", "user")
-CONNECTION_PASSWORD = os.getenv("CONNECTION_PASSWORD", "password")
+CONNECTION_USER = os.getenv("CONNECTION_USER", "cta_admin")
+CONNECTION_PASSWORD = os.getenv("CONNECTION_PASSWORD", "chicago")
 
-
-print(f"-{CONNECTION_URL}-")
-print(f"-{CONNECTION_USER}-")
-print(f"-{CONNECTION_PASSWORD}-")
 
 def configure_connector():
     """Starts and configures the Kafka Connect connector"""
@@ -57,7 +53,7 @@ def configure_connector():
             }
         )
     )
-    ## Ensure a healthy response was given
+    # Ensure a healthy response was given
     try:
         resp.raise_for_status()
         logging.info("connector created successfully")
