@@ -34,7 +34,7 @@ class Weather(Producer):
             "org.chicago.cta.weather.v1",
             key_schema=Weather.key_schema,
             value_schema=Weather.value_schema,
-            num_partitions=1, # TODO: Update
+            num_partitions=1,
             num_replicas=1
         )
 
@@ -66,7 +66,7 @@ class Weather(Producer):
 
     @staticmethod
     def _farenheit_to_celsius(farenheit):
-        return round((farenheit - 32) * 5/9, 1)
+        return round((farenheit - 32) * 5 / 9, 1)
 
     def run(self, month):
         self._set_weather(month)
@@ -89,7 +89,7 @@ class Weather(Producer):
         }
         resp = requests.post(
             f"{Weather.rest_proxy_url}/topics/{self.topic_name}",
-            headers = {"Content-Type": "application/vnd.kafka.avro.v2+json"},
+            headers={"Content-Type": "application/vnd.kafka.avro.v2+json"},
             data=json.dumps(data)
         )
         try:
