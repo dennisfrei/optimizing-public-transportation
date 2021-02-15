@@ -39,11 +39,10 @@ class Producer:
             {"url": self._SCHEMA_REGISTRY_URL}
         )
 
-
         self.broker_properties = {
             "bootstrap.servers": self._BROKER_URL,
             "client.id": "0",
-             "compression.type": "lz4"
+            "compression.type": "lz4"
         }
         self.broker_properties.update(broker_properties)
 
@@ -67,7 +66,7 @@ class Producer:
     def create_topic(self):
         """Creates the producer topic if it does not already exist"""
 
-        client = AdminClient({"bootstrap.servers": self._BROKER_URL})  
+        client = AdminClient({"bootstrap.servers": self._BROKER_URL})
         futures = client.create_topics(
             [
                 NewTopic(
@@ -94,4 +93,3 @@ class Producer:
         logger.debug(f"Shutting down")
         if self.producer is not None:
             self.producer.flush()
-
