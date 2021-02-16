@@ -35,9 +35,15 @@ class KafkaConsumer:
         self._SCHEMA_REGISTRY_URL = "http://localhost:8081"
         self.broker_properties = {
             "bootstrap.servers": self._BROKER_URL,
-            "group.id": "0"
+            "group.id": "0",
+            "auto.offset.reset": "latest"
         }
         self.broker_properties.update(broker_properties)
+
+        if offset_earliest is True:
+            self.broker_properties.update(
+                {"auto.offset.reset": "earliest"}
+            )
 
         if is_avro is True:
             self.broker_properties.update(
