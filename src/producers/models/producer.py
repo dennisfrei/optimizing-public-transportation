@@ -33,8 +33,8 @@ class Producer:
         self.value_schema = value_schema
         self.num_partitions = num_partitions
         self.num_replicas = num_replicas
-        self._BROKER_URL = "PLAINTEXT://localhost:9092"
-        self._SCHEMA_REGISTRY_URL = "http://localhost:8081"
+        self._BROKER_URL = "PLAINTEXT://127.0.0.1:9092"
+        self._SCHEMA_REGISTRY_URL = "http://127.0.0.1:8081"
         self.schema_registry = CachedSchemaRegistryClient(
             {"url": self._SCHEMA_REGISTRY_URL}
         )
@@ -42,17 +42,12 @@ class Producer:
         self.broker_properties = {
             "bootstrap.servers": self._BROKER_URL,
             "client.id": "0",
-            # "linger.ms": 1000,
-            # "compression.type": "lz4",
-            # "batch.num.messages": 100,
+            "compression.type": "lz4"
         }
         self.broker_properties.update(broker_properties)
 
         self.topic_properties = {
-            "cleanup.policy": "delete",
-            # "compression.type": "lz4",
-            # "delete.retention.ms": "2000",
-            # "file.delete.delay.ms": "2000",
+            "cleanup.policy": "delete"
         }
         self.topic_properties.update(topic_properties)
 
@@ -71,7 +66,7 @@ class Producer:
     def create_topic(self):
         """Creates the producer topic if it does not already exist"""
 
-        client = AdminClient({"bootstrap.servers": self._BROKER_URL})  
+        client = AdminClient({"bootstrap.servers": self._BROKER_URL})
         futures = client.create_topics(
             [
                 NewTopic(
@@ -98,4 +93,3 @@ class Producer:
         logger.debug(f"Shutting down")
         if self.producer is not None:
             self.producer.flush()
-

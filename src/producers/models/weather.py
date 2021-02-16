@@ -21,7 +21,7 @@ class Weather(Producer):
         "status", "sunny partly_cloudy cloudy windy precipitation", start=0
     )
 
-    rest_proxy_url = "http://localhost:8082"
+    rest_proxy_url = "http://127.0.0.1:8082"
 
     key_schema = None
     value_schema = None
@@ -29,19 +29,13 @@ class Weather(Producer):
     winter_months = set((0, 1, 2, 3, 10, 11))
     summer_months = set((6, 7, 8))
 
-    def __init__(self, month):
-        #
-        #
-        # TODO: Complete the below by deciding on a topic name, number of partitions, and number of
-        # replicas
-        #
-        #
+    def __init__(self, month, to_celsius=False):
         super().__init__(
-            "org.chicago.transit.weather",
+            "org.chicago.cta.weather.v1",
             key_schema=Weather.key_schema,
             value_schema=Weather.value_schema,
-            num_partitions=1, # TODO: Update
-            num_replicas=1 # TODO: Update
+            num_partitions=1,
+            num_replicas=1
         )
 
         self.status = Weather.status.sunny
@@ -50,6 +44,7 @@ class Weather(Producer):
             self.temp = 40.0
         elif month in Weather.summer_months:
             self.temp = 85.0
+        self.to_celsius = to_celsius
 
         if Weather.key_schema is None:
             with open(f"{Path(__file__).parents[0]}/schemas/weather_key.json") as f:
@@ -69,9 +64,16 @@ class Weather(Producer):
         self.temp += min(max(-20.0, random.triangular(-10.0, 10.0, mode)), 100.0)
         self.status = random.choice(list(Weather.status))
 
+    @staticmethod
+    def _farenheit_to_celsius(farenheit):
+        return round((farenheit - 32) * 5 / 9, 1)
+
     def run(self, month):
         self._set_weather(month)
-
+        if self.to_celsius:
+            temp = self._farenheit_to_celsius(self.temp)
+        else:
+            temp = self.temp
         data = {
             "key_schema": json.dumps(Weather.key_schema),
             "value_schema": json.dumps(Weather.value_schema),
@@ -79,7 +81,7 @@ class Weather(Producer):
                 {
                     "key": {"timestamp": self.time_millis()},
                     "value": {
-                        "temperature": self.temp,
+                        "temperature": temp,
                         "status": self.status.name,
                     }
                 }
@@ -87,7 +89,7 @@ class Weather(Producer):
         }
         resp = requests.post(
             f"{Weather.rest_proxy_url}/topics/{self.topic_name}",
-            headers = {"Content-Type": "application/vnd.kafka.avro.v2+json"},
+            headers={"Content-Type": "application/vnd.kafka.avro.v2+json"},
             data=json.dumps(data)
         )
         try:
@@ -98,7 +100,7 @@ class Weather(Producer):
 
         logger.debug(
             "sent weather data to kafka, temp: {}, status: {}".format(
-                self.temp,
+                temp,
                 self.status.name
             )
         )

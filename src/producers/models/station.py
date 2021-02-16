@@ -27,13 +27,13 @@ class Station(Producer):
             .replace("'", "")
         )
 
-        self.topic_name = f"org.chicago.transit.arrivals" # .{self.station_name}" # TODO: Come up with a better topic name
+        self.topic_name = f"org.chicago.cta.station.arrivals.{self.station_name}.v1"
         super().__init__(
             self.topic_name,
             key_schema=Station.key_schema,
             value_schema=Station.value_schema,
-            num_partitions=1, # TODO Update
-            num_replicas=1 # TODO Update
+            num_partitions=2,
+            num_replicas=1
         )
 
         self.station_id = int(station_id)
@@ -43,7 +43,6 @@ class Station(Producer):
         self.a_train = None
         self.b_train = None
         self.turnstile = Turnstile(self)
-
 
     def run(self, train, direction, prev_station_id, prev_direction):
         """Simulates train arrivals at this station"""
@@ -60,7 +59,6 @@ class Station(Producer):
                 "prev_direction": prev_direction
             }
         )
-
 
     def __str__(self):
         return "Station | {:^5} | {:<30} | Direction A: | {:^5} | departing to {:<30} | Direction B: | {:^5} | departing to {:<30} | ".format(

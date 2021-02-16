@@ -8,36 +8,78 @@ Streaming event pipeline with Apache Kafka and its ecosystem, using public data 
 * Docker
 * Python 3.7^
 
-## Instructions
-
-- Set up
-	```bash
-	git clone https://github.com/dennisfrei/optimizing-public-transportation.git
-	cd optimizing-public-transportation
-	docker-compose up
-	```
-
 ![Project Architecture](docs/images/diagram.png)
-
-### Resources
-
-* [Confluent Python Client Documentation](https://docs.confluent.io/current/clients/confluent-kafka-python/#)
-* [Confluent Python Client Usage and Examples](https://github.com/confluentinc/confluent-kafka-python#usage)
-* [REST Proxy API Reference](https://docs.confluent.io/current/kafka-rest/api.html#post--topics-(string-topic_name))
-* [Kafka Connect JDBC Source Connector Configuration Options](https://docs.confluent.io/current/connect/kafka-connect-jdbc/source-connector/source_config_options.html)
-
 
 ## Running and Testing
 
-To run the simulation, you must first start up the Kafka ecosystem on your machine utilizing Docker Compose.
+### Set Up
 
 ```bash
+git clone https://github.com/dennisfrei/optimizing-public-transportation.git
+cd optimizing-public-transportation
+```
+
+### Start Kafka and ecosystem
+
+```bash
+cd etc
 docker-compose up
 ```
 
 Docker compose will take a 3-5 minutes to start, depending on your hardware. Please be patient and wait for the docker-compose logs to slow down or stop before beginning the simulation.
 
-Once docker-compose is ready, the following services will be available:
+### Producers
+
+- Switch to producer directory
+	```bash
+	cd src/producers
+	```
+- Set up the database credentials
+	```bash
+	cp .env.example .env
+	```
+
+- Change env and install producer requirements
+	```bash
+	pip install -r requirements.txt
+	```
+
+- Start the simulation 
+	```
+	python simulation.py
+	```
+
+You can check if everything works as expected by checking the topics with the UI at `localhost:8085`
+
+### Consumers
+
+- Switch to producer directory
+	```bash
+	cd src/consumers
+	```
+
+- Change env and install consumer requirements
+	```bash
+	pip install -r requirements.txt
+	```
+
+- Start the Faust Streaming Application
+	```bash
+	faust -A faust_stream worker -l info
+	```
+
+- Start KSQL Query
+	```bash
+	python ksql.py
+	```
+
+- Start the server application
+	```bash
+	python server.py
+	```
+
+
+### Overview of service ports
 
 | Service | Host URL | Docker URL | Username | Password |
 | --- | --- | --- | --- | --- |
@@ -51,7 +93,3 @@ Once docker-compose is ready, the following services will be available:
 | Kafka Connect | [http://localhost:8083](http://localhost:8083) | http://kafka-connect:8083 |
 | KSQL | [http://localhost:8088](http://localhost:8088) | http://ksql:8088 |
 | PostgreSQL | `jdbc:postgresql://localhost:5432/cta` | `jdbc:postgresql://postgres:5432/cta` | `cta_admin` | `chicago` |
-
-Note that to access these services from your own machine, you will always use the `Host URL` column.
-
-When configuring services that run within Docker Compose, like **Kafka Connect you must use the Docker URL**. When you configure the JDBC Source Kafka Connector, for example, you will want to use the value from the `Docker URL` column.
