@@ -4,6 +4,19 @@
   "namespace": "org.chicago",
   "fields": [
       {"name": "temperature", "type": "float"},
-      {"name": "status", "type": "string"}
+      {
+        "name": "status", "type": {
+          "type": "enum",
+          "name": "state",
+          "doc": "The possible weather status types",
+          "symbols": [
+            "sunny",
+            "partly_cloudy",
+            "cloudy",
+            "windy",
+            "precipitation"
+          ]
+        }
+      }
   ]
 }
